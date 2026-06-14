@@ -16,7 +16,7 @@ exports.handler = async (event) => {
   }
 
   const token = process.env.NOTION_TOKEN;
-  const SETLIST_DB = '919d0e2d-aae4-447e-8562-3470a5efb68e';
+  const SETLIST_DB = '0afb7176-9d6e-4f37-b18b-7c9ac8adbfa4';
 
   let payload;
   try {
@@ -41,7 +41,8 @@ exports.handler = async (event) => {
   };
 
   if (purpose) properties['Purpose'] = { select: { name: purpose } };
-  if (notes) properties['Order Notes'] = { rich_text: [{ text: { content: notes } }] };
+  // Store ordered song IDs as JSON so Load Setlist can restore the exact order
+  properties['Order Notes'] = { rich_text: [{ text: { content: JSON.stringify(songs.map(s => s.id)) } }] };
 
   // Write ordered song list as numbered blocks inside the Notion page
   const children = songs.map((song) => ({

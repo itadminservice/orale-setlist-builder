@@ -45,8 +45,53 @@
       height: calc(100vh - 53px);
     }
 
+    /* ── Mobile tab bar ── */
+    #tab-bar {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 11px 8px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 0;
+      transition: color 0.15s;
+    }
+
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-badge {
+      display: none;
+      background: var(--accent);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 10px;
+      margin-left: 4px;
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+
     @media (max-width: 700px) {
-      .layout { grid-template-columns: 1fr; height: auto; }
+      #tab-bar { display: flex; }
+      .layout { grid-template-columns: 1fr; height: calc(100dvh - 53px - 43px); }
+      .pool-panel { border-right: none; }
+      .panel-hidden { display: none !important; }
+      .setlist-footer { flex-direction: column; gap: 8px; padding: 10px 12px; }
+      .setlist-stats { text-align: center; }
+      .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+      .btn-group button { padding: 9px 4px; font-size: 0.75rem; }
+      .remove-btn { padding: 8px 12px; font-size: 1rem; }
+      .drop-hint { padding: 28px 16px; }
     }
 
     /* ── Song Pool ── */
@@ -317,8 +362,206 @@
 
     .loading { text-align: center; padding: 36px; color: var(--muted); font-size: 0.85rem; }
 
+    /* ── Scrollbars ── */
+    .song-list, .setlist-drop {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #555 transparent;
+    }
+    .song-list::-webkit-scrollbar,
+    .setlist-drop::-webkit-scrollbar { width: 6px; }
+    .song-list::-webkit-scrollbar-track,
+    .setlist-drop::-webkit-scrollbar-track { background: var(--surface2); border-radius: 4px; }
+    .song-list::-webkit-scrollbar-thumb,
+    .setlist-drop::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+    .song-list::-webkit-scrollbar-thumb:hover,
+    .setlist-drop::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ── Landscape phone: compact cards so more fit in view ── */
+    @media (max-height: 520px) and (orientation: landscape) {
+      .song-card, .setlist-item { padding: 6px 10px; margin-bottom: 3px; }
+      .song-meta { margin-top: 1px; }
+      .panel-header { padding: 7px 12px; gap: 6px; }
+      .setlist-meta { padding: 6px 12px; gap: 5px; }
+    }
+
     .sortable-ghost { opacity: 0.25; background: var(--surface2); }
     .sortable-chosen { border-color: var(--accent) !important; }
+
+    /* ── Stage Print overlay ── */
+    #stage-print-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      color: #000;
+      z-index: 9999;
+      padding: 32px 40px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow-y: auto;
+    }
+
+    #stage-print-overlay.visible { display: block; }
+
+    #stage-print-overlay h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    #stage-print-overlay .stage-sub {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #000;
+    }
+
+    .stage-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 80px 90px;
+      align-items: center;
+      gap: 0 20px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .stage-num {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #aaa;
+      text-align: right;
+    }
+
+    .stage-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .stage-key {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #000;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .stage-bpm {
+      font-size: 1rem;
+      color: #555;
+      text-align: right;
+    }
+
+    .stage-footer-row {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #stage-close-btn {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Load Setlist Modal ── */
+    #load-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 8888;
+      align-items: center;
+      justify-content: center;
+    }
+    #load-modal-overlay.visible { display: flex; }
+
+    #load-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 420px;
+      max-width: 94vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #load-modal-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #load-modal-header h2 { font-size: 0.95rem; font-weight: 700; }
+
+    #load-modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    #load-modal-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px;
+    }
+
+    .setlist-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .setlist-option:hover { border-color: var(--accent); background: var(--surface2); }
+
+    .setlist-option-info { flex: 1; min-width: 0; }
+    .setlist-option-name { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .setlist-option-meta { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+
+    .setlist-option-load {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    @media print {
+      #stage-print-overlay.visible ~ * { display: none; }
+      #stage-print-overlay.visible { position: static; }
+      #stage-close-btn { display: none !important; }
+    }
 
     /* ── Print ── */
     #print-header, #print-footer { display: none; }
@@ -326,7 +569,7 @@
     @media print {
       body { background: #fff; color: #000; font-family: Georgia, serif; }
 
-      header, .pool-panel, .setlist-meta, .setlist-footer,
+      header, #tab-bar, .pool-panel, .setlist-meta, .setlist-footer,
       .remove-btn, .yt-link, #toast { display: none !important; }
 
       .layout { display: block; height: auto; }
@@ -378,6 +621,11 @@
   <h1>🎶 Órale</h1>
   <span>Setlist Builder</span>
 </header>
+
+<div id="tab-bar">
+  <button class="tab-btn active" id="tab-library" onclick="switchTab('library')">Song Library</button>
+  <button class="tab-btn" id="tab-setlist-btn" onclick="switchTab('setlist')">Setlist <span id="tab-badge" class="tab-badge"></span></button>
+</div>
 
 <div id="print-header"></div>
 
@@ -437,8 +685,11 @@
         <strong id="stat-songs">0 songs</strong> &nbsp;·&nbsp; <strong id="stat-time">0:00</strong>
       </div>
       <div class="btn-group">
+        <button class="btn-secondary" onclick="openLoadModal()">Load Setlist</button>
         <button class="btn-secondary" onclick="clearSetlist()">Clear</button>
-        <button class="btn-secondary" onclick="printSetlist()">Print / PDF</button>
+        <button class="btn-secondary" onclick="copyText()" title="Copy plain text for texting">Copy Text</button>
+        <button class="btn-secondary" onclick="stagePrint()">Stage Print</button>
+        <button class="btn-secondary" onclick="printSetlist()">Full Print</button>
         <button class="btn-primary" id="save-btn" onclick="saveToNotion()">Save to Notion</button>
       </div>
     </div>
@@ -448,9 +699,30 @@
 
 <div id="toast"></div>
 
+<!-- Load Setlist Modal -->
+<div id="load-modal-overlay">
+  <div id="load-modal">
+    <div id="load-modal-header">
+      <h2>Load Saved Setlist</h2>
+      <button id="load-modal-close" onclick="closeLoadModal()">✕</button>
+    </div>
+    <div id="load-modal-list">
+      <div class="loading">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage Print Overlay -->
+<div id="stage-print-overlay">
+  <button id="stage-close-btn" onclick="closeStagePrint()">✕ Close</button>
+  <div id="stage-print-content"></div>
+</div>
+
 <script>
   let allSongs = [];
   let setlistSongs = [];
+  let poolSortable = null;
+  let setlistSortable = null;
 
   // ── Load from Notion ──
   async function loadSongs() {
@@ -533,6 +805,7 @@
     const song = allSongs.find(s => s.id === id);
     if (!song || setlistSongs.find(s => s.id === id)) return;
     setlistSongs.push(song);
+    if (window.innerWidth <= 700) switchTab('setlist');
     renderSetlist();
   }
 
@@ -554,33 +827,41 @@
     const sec = Math.round((total % 1) * 60);
     document.getElementById('stat-songs').textContent = `${setlistSongs.length} song${setlistSongs.length !== 1 ? 's' : ''}`;
     document.getElementById('stat-time').textContent  = h > 0 ? `${h}h ${m}m` : `${m}:${String(sec).padStart(2,'0')}`;
+    const badge = document.getElementById('tab-badge');
+    badge.textContent = setlistSongs.length || '';
+    badge.style.display = setlistSongs.length ? 'inline-block' : 'none';
   }
 
   // ── Sortable: pool (drag source only) ──
   function initPoolSortable() {
-    Sortable.create(document.getElementById('song-pool'), {
+    if (poolSortable) { poolSortable.destroy(); poolSortable = null; }
+    // On touch/mobile: skip sortable on the pool so finger scrolling works freely.
+    // Songs are added by tap, not drag, on mobile.
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    poolSortable = Sortable.create(document.getElementById('song-pool'), {
       group: { name: 'songs', pull: 'clone', put: false },
       sort: false,
       animation: 150,
-      onEnd(evt) {
-        if (evt.to.id === 'setlist-drop') {
-          evt.item.remove();
-          addToSetlist(evt.item.dataset.id);
-        }
-      },
+      // onEnd intentionally omitted — setlist onAdd handles all drops
     });
   }
 
   // ── Sortable: setlist (reorder + drop target) ──
   function initSetlistSortable() {
-    Sortable.create(document.getElementById('setlist-drop'), {
+    if (setlistSortable) { setlistSortable.destroy(); setlistSortable = null; }
+    setlistSortable = Sortable.create(document.getElementById('setlist-drop'), {
       group: { name: 'songs', pull: false, put: true },
       animation: 150,
       ghostClass: 'sortable-ghost',
       chosenClass: 'sortable-chosen',
+      // On touch: wait 200ms before treating as a drag so quick swipes scroll the list
+      delay: 200,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 5,
       onAdd(evt) {
+        const id = evt.item.dataset.id;
         evt.item.remove();
-        addToSetlist(evt.item.dataset.id);
+        addToSetlist(id);
       },
       onUpdate() {
         const items = document.querySelectorAll('#setlist-drop .setlist-item');
@@ -601,6 +882,69 @@
 
   // ── Default date = today ──
   document.getElementById('setlist-date').value = new Date().toISOString().split('T')[0];
+
+  // ── Stage Print ──
+  function stagePrint() {
+    if (!setlistSongs.length) { showToast('Add songs before printing', 'error'); return; }
+    const name = document.getElementById('setlist-name').value || 'Setlist';
+    const rawDate = document.getElementById('setlist-date').value;
+    const dateStr = rawDate
+      ? new Date(rawDate + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+      : '';
+    const total = setlistSongs.reduce((s, x) => s + (x.duration || 0), 0);
+    const h = Math.floor(total / 60), m = Math.floor(total % 60);
+
+    const rows = setlistSongs.map((s, i) => `
+      <div class="stage-row">
+        <span class="stage-num">${i + 1}</span>
+        <span class="stage-title">${escHtml(s.title)}</span>
+        <span class="stage-key">${s.key || '?'}</span>
+        <span class="stage-bpm">${s.tempo ? s.tempo + ' BPM' : ''}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('stage-print-content').innerHTML = `
+      <h1>🎶 Órale</h1>
+      <div class="stage-sub">${escHtml(name)}${dateStr ? ' &nbsp;·&nbsp; ' + dateStr : ''}</div>
+      ${rows}
+      <div class="stage-footer-row">
+        <span>${setlistSongs.length} songs</span>
+        <span>~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}</span>
+      </div>
+    `;
+
+    document.getElementById('stage-print-overlay').classList.add('visible');
+    setTimeout(() => window.print(), 100);
+  }
+
+  function closeStagePrint() {
+    document.getElementById('stage-print-overlay').classList.remove('visible');
+  }
+
+  // ── Copy Text (for texting) ──
+  function copyText() {
+    if (!setlistSongs.length) { showToast('Add songs before copying', 'error'); return; }
+    const name = document.getElementById('setlist-name').value || 'Setlist';
+    const rawDate = document.getElementById('setlist-date').value;
+    const dateStr = rawDate
+      ? new Date(rawDate + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      : '';
+    const total = setlistSongs.reduce((s, x) => s + (x.duration || 0), 0);
+    const h = Math.floor(total / 60), m = Math.floor(total % 60);
+
+    const header = `🎶 Órale — ${name}${dateStr ? ' (' + dateStr + ')' : ''}`;
+    const lines = setlistSongs.map((s, i) => {
+      let line = `${i + 1}. ${s.title} — ${s.key || '?'}`;
+      if (s.tempo) line += ` · ${s.tempo} BPM`;
+      return line;
+    });
+    const footer = `\nTotal: ${setlistSongs.length} songs · ~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
+    const text = [header, '', ...lines, footer].join('\n');
+
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Copied to clipboard ✓', 'success'))
+      .catch(() => showToast('Copy failed — try a different browser', 'error'));
+  }
 
   // ── Print ──
   function printSetlist() {
@@ -656,6 +1000,85 @@
     } finally {
       btn.disabled = false;
       btn.textContent = 'Save to Notion';
+    }
+  }
+
+  // ── Mobile tab switching ──
+  function switchTab(tab) {
+    if (window.innerWidth > 700) return;
+    const isLibrary = tab === 'library';
+    document.querySelector('.pool-panel').classList.toggle('panel-hidden', !isLibrary);
+    document.querySelector('.setlist-panel').classList.toggle('panel-hidden', isLibrary);
+    document.getElementById('tab-library').classList.toggle('active', isLibrary);
+    document.getElementById('tab-setlist-btn').classList.toggle('active', !isLibrary);
+  }
+
+  // ── Load Setlist Modal ──
+  async function openLoadModal() {
+    document.getElementById('load-modal-overlay').classList.add('visible');
+    const listEl = document.getElementById('load-modal-list');
+    listEl.innerHTML = '<div class="loading">Loading saved setlists…</div>';
+
+    try {
+      const res = await fetch('/.netlify/functions/get-setlists');
+      const setlists = await res.json();
+
+      if (!setlists.length) {
+        listEl.innerHTML = '<div class="loading">No saved setlists yet.</div>';
+        return;
+      }
+
+      listEl.innerHTML = setlists.map(sl => `
+        <div class="setlist-option">
+          <div class="setlist-option-info">
+            <div class="setlist-option-name">${escHtml(sl.name)}</div>
+            <div class="setlist-option-meta">${sl.date || ''}${sl.status ? ' · ' + sl.status : ''}</div>
+          </div>
+          <button class="setlist-option-load" data-id="${sl.id}">Load</button>
+        </div>
+      `).join('');
+
+      listEl.querySelectorAll('.setlist-option-load').forEach(btn => {
+        btn.addEventListener('click', () => loadSetlist(btn.dataset.id));
+      });
+    } catch {
+      listEl.innerHTML = '<div class="loading" style="color:var(--danger)">Failed to fetch setlists.</div>';
+    }
+  }
+
+  function closeLoadModal() {
+    document.getElementById('load-modal-overlay').classList.remove('visible');
+  }
+
+  document.getElementById('load-modal-overlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('load-modal-overlay')) closeLoadModal();
+  });
+
+  async function loadSetlist(id) {
+    closeLoadModal();
+    try {
+      const res = await fetch(`/.netlify/functions/get-setlists?id=${id}`);
+      const { orderedIds } = await res.json();
+
+      if (!orderedIds || !orderedIds.length) {
+        showToast('Setlist has no song order saved (saved before this feature)', 'error');
+        return;
+      }
+
+      const loaded = orderedIds
+        .map(sid => allSongs.find(s => s.id === sid))
+        .filter(Boolean);
+
+      if (!loaded.length) {
+        showToast('Could not match songs — reload the page and try again', 'error');
+        return;
+      }
+
+      setlistSongs = loaded;
+      renderSetlist();
+      showToast(`Loaded ${loaded.length} songs ✓`, 'success');
+    } catch {
+      showToast('Failed to load setlist', 'error');
     }
   }
 

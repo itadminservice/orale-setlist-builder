@@ -1,6 +1,6 @@
 exports.handler = async () => {
   const token = process.env.NOTION_TOKEN;
-  const databaseId = '90c3bad1-e1d4-4b52-8423-ad4277bfdc9f';
+  const databaseId = 'e59ac45e-8b84-4b48-9e8f-1df29c80c7ee';
 
   const songs = [];
   let cursor;
@@ -26,6 +26,14 @@ exports.handler = async () => {
 
     const data = await res.json();
 
+    if (!res.ok || !data.results) {
+      return {
+        statusCode: res.status || 500,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: data.message || data.code || 'Unknown Notion error', raw: data }),
+      };
+    }
+
     for (const page of data.results) {
       const p = page.properties;
       songs.push({
@@ -36,6 +44,7 @@ exports.handler = async () => {
         feel: p['Feel'].multi_select.map((f) => f.name),
         duration: p['Duration (min)'].number || 0,
         youtube: p['YouTube Reference'].url || '',
+        tempo: p['Tempo']?.number || 0,
         status: p['Status'].select?.name || '',
       });
     }
