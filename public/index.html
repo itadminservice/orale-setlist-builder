@@ -388,6 +388,45 @@
     .sortable-ghost { opacity: 0.25; background: var(--surface2); }
     .sortable-chosen { border-color: var(--accent) !important; }
 
+    /* ── Set Break divider ── */
+    .set-break {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 4px;
+      margin-bottom: 5px;
+      cursor: grab;
+      user-select: none;
+    }
+    .set-break:active { cursor: grabbing; }
+    .set-break-line { flex: 1; height: 2px; background: var(--accent); opacity: 0.35; border-radius: 1px; }
+    .set-break-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Stage Print: set break row */
+    .stage-break-row {
+      column-span: all;
+      padding: 12px 0 8px;
+      text-align: center;
+      border-top: 2px solid #ccc;
+      border-bottom: 2px solid #ccc;
+      margin: 8px 0;
+    }
+    .stage-break-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #888;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
     /* ── Stage Print overlay ── */
     #stage-print-overlay {
       display: none;
@@ -417,42 +456,64 @@
       border-bottom: 2px solid #000;
     }
 
-    .stage-row {
+    .stage-songs {
       display: grid;
-      grid-template-columns: 36px 1fr 80px 90px;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 52px;
+      margin-top: 12px;
+    }
+
+    .stage-col-header {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #aaa;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #000;
+      margin-bottom: 4px;
+    }
+
+    .stage-row {
+      display: flex;
       align-items: center;
-      gap: 0 20px;
-      padding: 10px 0;
-      border-bottom: 1px solid #e0e0e0;
+      gap: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e8e8e8;
+      white-space: nowrap;
     }
 
     .stage-num {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: #aaa;
+      color: #bbb;
+      min-width: 26px;
       text-align: right;
+      flex-shrink: 0;
     }
 
     .stage-title {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      flex: 1;
     }
 
     .stage-key {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: #000;
-      background: #f0f0f0;
+      color: #fff;
+      background: #000;
       text-align: center;
-      padding: 4px 10px;
+      padding: 3px 14px;
       border-radius: 6px;
+      flex-shrink: 0;
     }
 
     .stage-bpm {
       font-size: 1rem;
-      color: #555;
-      text-align: right;
+      color: #888;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .stage-footer-row {
@@ -557,9 +618,30 @@
       flex-shrink: 0;
     }
 
+    .setlist-option-append {
+      background: none;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .setlist-option-btns { display: flex; gap: 5px; flex-shrink: 0; }
+
     @media print {
-      #stage-print-overlay.visible ~ * { display: none; }
-      #stage-print-overlay.visible { position: static; }
+      body.stage-printing > *:not(#stage-print-overlay) { display: none !important; }
+      body.stage-printing #stage-print-overlay {
+        display: block !important;
+        position: static;
+        padding: 20px 32px;
+      }
+      body.stage-printing #stage-print-overlay h1 { font-size: 1.2rem; margin-bottom: 1px; }
+      body.stage-printing #stage-print-overlay .stage-sub { margin-bottom: 12px; }
+      body.stage-printing .stage-row { padding: 6px 0; }
       #stage-close-btn { display: none !important; }
     }
 
@@ -657,7 +739,7 @@
   <div class="setlist-panel">
     <div class="setlist-meta">
       <div class="meta-row">
-        <input type="text" id="setlist-name" placeholder="Setlist name  (e.g. Pengilly's — Fri June 20)" />
+        <input type="text" id="setlist-name" placeholder="Setlist name  (e.g. Maddie's — Fri June 20)" />
       </div>
       <div class="meta-row">
         <select id="setlist-purpose">
@@ -669,6 +751,7 @@
           <option>Opener</option>
           <option>Closer</option>
           <option>Custom</option>
+          <option>Template</option>
         </select>
         <input type="date" id="setlist-date" />
       </div>
@@ -687,6 +770,7 @@
       <div class="btn-group">
         <button class="btn-secondary" onclick="openLoadModal()">Load Setlist</button>
         <button class="btn-secondary" onclick="clearSetlist()">Clear</button>
+        <button class="btn-secondary" onclick="addSetBreak()">+ Set Break</button>
         <button class="btn-secondary" onclick="copyText()" title="Copy plain text for texting">Copy Text</button>
         <button class="btn-secondary" onclick="stagePrint()">Stage Print</button>
         <button class="btn-secondary" onclick="printSetlist()">Full Print</button>
@@ -779,17 +863,30 @@
     if (setlistSongs.length === 0) {
       drop.innerHTML = '<div class="drop-hint">Drag songs here — or click a song to add it</div>';
     } else {
-      drop.innerHTML = setlistSongs.map((s, i) => `
-        <div class="setlist-item" data-id="${s.id}">
-          <span class="item-num">${i + 1}</span>
-          <span class="key-badge">${s.key || '?'}</span>
-          <div class="item-info">
-            <div class="item-title">${escHtml(s.title)}</div>
-            <div class="item-sub">${escHtml(s.artist)}${s.duration ? ` · ${s.duration} min` : ''}</div>
-          </div>
-          <button class="remove-btn" data-remove="${s.id}" title="Remove">✕</button>
-        </div>
-      `).join('');
+      let songNum = 0, breakNum = 0;
+      drop.innerHTML = setlistSongs.map(s => {
+        if (s.type === 'break') {
+          breakNum++;
+          return `
+            <div class="set-break" data-id="${s.id}">
+              <div class="set-break-line"></div>
+              <span class="set-break-label">Set ${breakNum + 1}</span>
+              <div class="set-break-line"></div>
+              <button class="remove-btn" data-remove="${s.id}" title="Remove break">✕</button>
+            </div>`;
+        }
+        songNum++;
+        return `
+          <div class="setlist-item" data-id="${s.id}">
+            <span class="item-num">${songNum}</span>
+            <span class="key-badge">${s.key || '?'}</span>
+            <div class="item-info">
+              <div class="item-title">${escHtml(s.title)}</div>
+              <div class="item-sub">${escHtml(s.artist)}${s.duration ? ` · ${s.duration} min` : ''}</div>
+            </div>
+            <button class="remove-btn" data-remove="${s.id}" title="Remove">✕</button>
+          </div>`;
+      }).join('');
 
       drop.querySelectorAll('[data-remove]').forEach(btn => {
         btn.addEventListener('click', () => removeFromSetlist(btn.dataset.remove));
@@ -805,6 +902,9 @@
     const song = allSongs.find(s => s.id === id);
     if (!song || setlistSongs.find(s => s.id === id)) return;
     setlistSongs.push(song);
+    const searchEl = document.getElementById('search');
+    searchEl.value = '';
+    if (!window.matchMedia('(pointer: coarse)').matches) searchEl.focus();
     if (window.innerWidth <= 700) switchTab('setlist');
     renderSetlist();
   }
@@ -820,16 +920,22 @@
     renderSetlist();
   }
 
+  function addSetBreak() {
+    setlistSongs.push({ id: `break-${Date.now()}`, type: 'break' });
+    renderSetlist();
+  }
+
   function updateStats() {
-    const total = setlistSongs.reduce((sum, s) => sum + (s.duration || 0), 0);
+    const actualSongs = setlistSongs.filter(s => !s.type);
+    const total = actualSongs.reduce((sum, s) => sum + (s.duration || 0), 0);
     const h   = Math.floor(total / 60);
     const m   = Math.floor(total % 60);
     const sec = Math.round((total % 1) * 60);
-    document.getElementById('stat-songs').textContent = `${setlistSongs.length} song${setlistSongs.length !== 1 ? 's' : ''}`;
+    document.getElementById('stat-songs').textContent = `${actualSongs.length} song${actualSongs.length !== 1 ? 's' : ''}`;
     document.getElementById('stat-time').textContent  = h > 0 ? `${h}h ${m}m` : `${m}:${String(sec).padStart(2,'0')}`;
     const badge = document.getElementById('tab-badge');
-    badge.textContent = setlistSongs.length || '';
-    badge.style.display = setlistSongs.length ? 'inline-block' : 'none';
+    badge.textContent = actualSongs.length || '';
+    badge.style.display = actualSongs.length ? 'inline-block' : 'none';
   }
 
   // ── Sortable: pool (drag source only) ──
@@ -864,7 +970,7 @@
         addToSetlist(id);
       },
       onUpdate() {
-        const items = document.querySelectorAll('#setlist-drop .setlist-item');
+        const items = document.querySelectorAll('#setlist-drop [data-id]');
         const reordered = [];
         items.forEach(el => {
           const s = setlistSongs.find(x => x.id === el.dataset.id);
@@ -891,34 +997,74 @@
     const dateStr = rawDate
       ? new Date(rawDate + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
       : '';
-    const total = setlistSongs.reduce((s, x) => s + (x.duration || 0), 0);
+    const actualSongs = setlistSongs.filter(s => !s.type);
+    const total = actualSongs.reduce((s, x) => s + (x.duration || 0), 0);
     const h = Math.floor(total / 60), m = Math.floor(total % 60);
 
-    const rows = setlistSongs.map((s, i) => `
-      <div class="stage-row">
-        <span class="stage-num">${i + 1}</span>
-        <span class="stage-title">${escHtml(s.title)}</span>
-        <span class="stage-key">${s.key || '?'}</span>
-        <span class="stage-bpm">${s.tempo ? s.tempo + ' BPM' : ''}</span>
-      </div>
-    `).join('');
+    // Split into two columns: at set break if present, otherwise at midpoint
+    const breakIdx = setlistSongs.findIndex(s => s.type === 'break');
+    let col1Songs, col2Songs, col2Label;
+    if (breakIdx !== -1) {
+      col1Songs = setlistSongs.slice(0, breakIdx);
+      col2Songs = setlistSongs.slice(breakIdx + 1);
+      col2Label = 'Set 2';
+    } else {
+      const mid = Math.ceil(setlistSongs.length / 2);
+      col1Songs = setlistSongs.slice(0, mid);
+      col2Songs = setlistSongs.slice(mid);
+      col2Label = null;
+    }
+
+    function renderColRows(songs, startNum) {
+      let num = startNum;
+      return songs.map(s => {
+        num++;
+        return `
+          <div class="stage-row">
+            <span class="stage-num">${num}</span>
+            <span class="stage-title">${escHtml(s.title)}</span>
+            <span class="stage-key">${s.key || '?'}</span>
+            ${s.tempo ? `<span class="stage-bpm">${s.tempo} BPM</span>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    const col1Html = renderColRows(col1Songs, 0);
+    const col2Html = col2Songs.length ? renderColRows(col2Songs, col1Songs.length) : '';
+    const col2Header = col2Label ? `<div class="stage-col-header">${col2Label}</div>` : '';
 
     document.getElementById('stage-print-content').innerHTML = `
       <h1>🎶 Órale</h1>
       <div class="stage-sub">${escHtml(name)}${dateStr ? ' &nbsp;·&nbsp; ' + dateStr : ''}</div>
-      ${rows}
+      <div class="stage-songs" style="${col2Html ? '' : 'grid-template-columns: 1fr'}">
+        <div class="stage-col">${col1Html}</div>
+        ${col2Html ? `<div class="stage-col">${col2Header}${col2Html}</div>` : ''}
+      </div>
       <div class="stage-footer-row">
-        <span>${setlistSongs.length} songs</span>
+        <span>${actualSongs.length} songs</span>
         <span>~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}</span>
       </div>
     `;
 
+    // Force landscape orientation for stage print
+    let pageStyle = document.getElementById('stage-page-style');
+    if (!pageStyle) {
+      pageStyle = document.createElement('style');
+      pageStyle.id = 'stage-page-style';
+      document.head.appendChild(pageStyle);
+    }
+    pageStyle.textContent = '@page { size: landscape; }';
+
+    document.body.classList.add('stage-printing');
     document.getElementById('stage-print-overlay').classList.add('visible');
     setTimeout(() => window.print(), 100);
   }
 
   function closeStagePrint() {
     document.getElementById('stage-print-overlay').classList.remove('visible');
+    document.body.classList.remove('stage-printing');
+    const pageStyle = document.getElementById('stage-page-style');
+    if (pageStyle) pageStyle.remove();
   }
 
   // ── Copy Text (for texting) ──
@@ -929,16 +1075,20 @@
     const dateStr = rawDate
       ? new Date(rawDate + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
       : '';
-    const total = setlistSongs.reduce((s, x) => s + (x.duration || 0), 0);
+    const actualSongs = setlistSongs.filter(s => !s.type);
+    const total = actualSongs.reduce((s, x) => s + (x.duration || 0), 0);
     const h = Math.floor(total / 60), m = Math.floor(total % 60);
 
     const header = `🎶 Órale — ${name}${dateStr ? ' (' + dateStr + ')' : ''}`;
-    const lines = setlistSongs.map((s, i) => {
-      let line = `${i + 1}. ${s.title} — ${s.key || '?'}`;
+    let copyNum = 0, copyBreak = 0;
+    const lines = setlistSongs.map(s => {
+      if (s.type === 'break') { copyBreak++; return `\n── Set ${copyBreak + 1} ──`; }
+      copyNum++;
+      let line = `${copyNum}. ${s.title} — ${s.key || '?'}`;
       if (s.tempo) line += ` · ${s.tempo} BPM`;
       return line;
     });
-    const footer = `\nTotal: ${setlistSongs.length} songs · ~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
+    const footer = `\nTotal: ${actualSongs.length} songs · ~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
     const text = [header, '', ...lines, footer].join('\n');
 
     navigator.clipboard.writeText(text)
@@ -954,7 +1104,8 @@
     const dateStr = rawDate
       ? new Date(rawDate + 'T12:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : '';
-    const total = setlistSongs.reduce((s, x) => s + (x.duration || 0), 0);
+    const actualSongs = setlistSongs.filter(s => !s.type);
+    const total = actualSongs.reduce((s, x) => s + (x.duration || 0), 0);
     const h = Math.floor(total / 60), m = Math.floor(total % 60);
 
     document.getElementById('print-header').innerHTML = `
@@ -962,7 +1113,7 @@
       <p>${escHtml(name)}${dateStr ? ' &nbsp;·&nbsp; ' + dateStr : ''}</p>
     `;
     document.getElementById('print-footer').innerHTML =
-      `${setlistSongs.length} songs &nbsp;·&nbsp; Total: ${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
+      `${actualSongs.length} songs &nbsp;·&nbsp; Total: ${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
 
     window.print();
   }
@@ -1028,18 +1179,25 @@
         return;
       }
 
+      const hasExisting = setlistSongs.length > 0;
       listEl.innerHTML = setlists.map(sl => `
         <div class="setlist-option">
           <div class="setlist-option-info">
             <div class="setlist-option-name">${escHtml(sl.name)}</div>
             <div class="setlist-option-meta">${sl.date || ''}${sl.status ? ' · ' + sl.status : ''}</div>
           </div>
-          <button class="setlist-option-load" data-id="${sl.id}">Load</button>
+          <div class="setlist-option-btns">
+            ${hasExisting ? `<button class="setlist-option-append" data-id="${sl.id}">Append</button>` : ''}
+            <button class="setlist-option-load" data-id="${sl.id}">${hasExisting ? 'Replace' : 'Load'}</button>
+          </div>
         </div>
       `).join('');
 
       listEl.querySelectorAll('.setlist-option-load').forEach(btn => {
-        btn.addEventListener('click', () => loadSetlist(btn.dataset.id));
+        btn.addEventListener('click', () => loadSetlist(btn.dataset.id, 'replace'));
+      });
+      listEl.querySelectorAll('.setlist-option-append').forEach(btn => {
+        btn.addEventListener('click', () => loadSetlist(btn.dataset.id, 'append'));
       });
     } catch {
       listEl.innerHTML = '<div class="loading" style="color:var(--danger)">Failed to fetch setlists.</div>';
@@ -1054,7 +1212,7 @@
     if (e.target === document.getElementById('load-modal-overlay')) closeLoadModal();
   });
 
-  async function loadSetlist(id) {
+  async function loadSetlist(id, mode = 'replace') {
     closeLoadModal();
     try {
       const res = await fetch(`/.netlify/functions/get-setlists?id=${id}`);
@@ -1066,7 +1224,9 @@
       }
 
       const loaded = orderedIds
-        .map(sid => allSongs.find(s => s.id === sid))
+        .map(sid => sid === 'BREAK'
+          ? { id: `break-${Date.now()}-${Math.random()}`, type: 'break' }
+          : allSongs.find(s => s.id === sid))
         .filter(Boolean);
 
       if (!loaded.length) {
@@ -1074,9 +1234,15 @@
         return;
       }
 
-      setlistSongs = loaded;
+      const songCount = loaded.filter(s => !s.type).length;
+      if (mode === 'append') {
+        setlistSongs = [...setlistSongs, ...loaded];
+        showToast(`Appended ${songCount} songs ✓`, 'success');
+      } else {
+        setlistSongs = loaded;
+        showToast(`Loaded ${songCount} songs ✓`, 'success');
+      }
       renderSetlist();
-      showToast(`Loaded ${loaded.length} songs ✓`, 'success');
     } catch {
       showToast('Failed to load setlist', 'error');
     }
