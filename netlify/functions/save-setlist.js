@@ -36,28 +36,33 @@ exports.handler = async (event) => {
     },
     Status: { select: { name: 'Draft' } },
     Songs: {
-      relation: songs.map((s) => ({ id: s.id })),
+      relation: songs.filter(s => s.type !== 'break').map((s) => ({ id: s.id })),
     },
   };
 
   if (purpose) properties['Purpose'] = { select: { name: purpose } };
-  // Store ordered song IDs as JSON so Load Setlist can restore the exact order
-  properties['Order Notes'] = { rich_text: [{ text: { content: JSON.stringify(songs.map(s => s.id)) } }] };
+  // Store ordered IDs with BREAK markers so Load Setlist can restore order and set breaks
+  properties['Order Notes'] = { rich_text: [{ text: { content: JSON.stringify(songs.map(s => s.type === 'break' ? 'BREAK' : s.id)) } }] };
 
   // Write ordered song list as numbered blocks inside the Notion page
-  const children = songs.map((song) => ({
-    object: 'block',
-    type: 'numbered_list_item',
-    numbered_list_item: {
-      rich_text: [
-        {
-          text: {
-            content: `${song.title}  —  ${song.artist}  (${song.key || '?'})${song.duration ? `  [${song.duration} min]` : ''}`,
-          },
-        },
-      ],
-    },
-  }));
+  let breakCount = 0;
+  const children = songs.map((song) => {
+    if (song.type === 'break') {
+      breakCount++;
+      return {
+        object: 'block',
+        type: 'heading_3',
+        heading_3: { rich_text: [{ text: { content: `── Set ${breakCount + 1} ──` } }] },
+      };
+    }
+    return {
+      object: 'block',
+      type: 'numbered_list_item',
+      numbered_list_item: {
+        rich_text: [{ text: { content: `${song.title}  —  ${song.artist}  (${song.key || '?'})${song.duration ? `  [${song.duration} min]` : ''}` } }],
+      },
+    };
+  });
 
   const res = await fetch('https://api.notion.com/v1/pages', {
     method: 'POST',

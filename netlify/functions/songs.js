@@ -44,8 +44,9 @@ exports.handler = async () => {
         feel: p['Feel'].multi_select.map((f) => f.name),
         duration: p['Duration (min)'].number || 0,
         youtube: p['YouTube Reference'].url || '',
-        tempo: p['Tempo']?.number || 0,
+        tempo: p['Tempo']?.rich_text[0]?.plain_text || '',
         status: p['Status'].select?.name || '',
+        homework: p['HomeWork']?.checkbox || false,
       });
     }
 

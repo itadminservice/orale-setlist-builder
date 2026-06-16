@@ -1,3 +1,16 @@
 [build]
   publish = "public"
   functions = "netlify/functions"
+
+# Redirect old /setlist.html path to root
+[[redirects]]
+  from = "/setlist.html"
+  to = "/"
+  status = 301
+
+# Redirect raw Netlify URL to custom domain
+[[redirects]]
+  from = "https://orale-setlist-app.netlify.app/*"
+  to = "https://setlist.oraleband.com/:splat"
+  status = 301
+  force = true
