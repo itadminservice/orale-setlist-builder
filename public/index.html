@@ -265,6 +265,8 @@
     .yt-badge:hover { background: #c00; }
     .yt-badge-stage { width: 30px; height: 22px; font-size: 0.75rem; }
 
+    .yt-url-print { display: none; }
+
     /* ── Setlist Panel ── */
     .setlist-panel {
       display: flex;
@@ -732,6 +734,7 @@
       .item-num { color: #000; font-size: 0.85rem; }
       .item-title { font-size: 1rem; }
       .item-sub { color: #555; font-size: 0.85rem; }
+      .yt-url-print { display: block; font-size: 0.68rem; color: #888; margin-top: 2px; word-break: break-all; }
       .key-badge { background: #000; color: #fff; font-size: 0.75rem; }
 
       .drop-hint { display: none; }
@@ -959,6 +962,7 @@
             <div class="item-info">
               <div class="item-title">${escHtml(s.title)}</div>
               <div class="item-sub">${escHtml(s.artist)}${s.duration ? ` · ${s.duration} min` : ''}</div>
+              ${s.youtube ? `<div class="yt-url-print">${escHtml(s.youtube)}</div>` : ''}
             </div>
             ${s.youtube ? `<a href="${s.youtube}" target="_blank" class="yt-badge" title="Watch on YouTube" onclick="event.stopPropagation()">YT</a>` : ''}
             <button class="remove-btn" data-remove="${s.id}" title="Remove">✕</button>
