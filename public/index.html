@@ -246,8 +246,24 @@
     }
     .yt-link:hover { color: #ff4444; }
 
-    .title-link { color: inherit; text-decoration: none; }
-    .title-link:hover { text-decoration: underline; }
+    .yt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.6rem;
+      letter-spacing: 0.04em;
+      width: 22px;
+      height: 18px;
+      border-radius: 4px;
+      text-decoration: none;
+      flex-shrink: 0;
+      font-family: sans-serif;
+    }
+    .yt-badge:hover { background: #c00; }
+    .yt-badge-stage { width: 30px; height: 22px; font-size: 0.75rem; }
 
     /* ── Setlist Panel ── */
     .setlist-panel {
@@ -941,9 +957,10 @@
             <span class="item-num">${songNum}</span>
             <span class="key-badge">${s.key || '?'}</span>
             <div class="item-info">
-              <div class="item-title">${s.youtube ? `<a href="${s.youtube}" target="_blank" class="title-link">${escHtml(s.title)}</a>` : escHtml(s.title)}</div>
+              <div class="item-title">${escHtml(s.title)}</div>
               <div class="item-sub">${escHtml(s.artist)}${s.duration ? ` · ${s.duration} min` : ''}</div>
             </div>
+            ${s.youtube ? `<a href="${s.youtube}" target="_blank" class="yt-badge" title="Watch on YouTube" onclick="event.stopPropagation()">YT</a>` : ''}
             <button class="remove-btn" data-remove="${s.id}" title="Remove">✕</button>
           </div>`;
       }).join('');
@@ -1083,9 +1100,10 @@
         return `
           <div class="stage-row">
             <span class="stage-num">${num}</span>
-            <span class="stage-title">${s.youtube ? `<a href="${s.youtube}" target="_blank" class="title-link">${escHtml(s.title)}</a>` : escHtml(s.title)}</span>
+            <span class="stage-title">${escHtml(s.title)}</span>
             <span class="stage-key">${s.key || '?'}</span>
             ${s.tempo ? `<span class="stage-bpm">${s.tempo} BPM</span>` : ''}
+            ${s.youtube ? `<a href="${s.youtube}" target="_blank" class="yt-badge yt-badge-stage" title="Watch on YouTube">YT</a>` : ''}
           </div>`;
       }).join('');
     }
