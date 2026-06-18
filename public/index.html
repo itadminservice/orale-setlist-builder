@@ -1114,14 +1114,31 @@
     }
     pageStyle.textContent = '@page { size: landscape; }';
 
-    document.body.classList.add('stage-printing');
-    document.getElementById('stage-print-overlay').classList.add('visible');
+    const overlay = document.getElementById('stage-print-overlay');
+    overlay.classList.add('visible');
+
+    // Explicitly hide every sibling before the print dialog opens
+    const siblings = Array.from(document.body.children)
+      .filter(el => el !== overlay && el.tagName !== 'SCRIPT');
+
+    function beforePrint() {
+      siblings.forEach(el => el.style.setProperty('display', 'none', 'important'));
+      overlay.style.cssText += '; position:static !important;';
+    }
+    function afterPrint() {
+      window.removeEventListener('beforeprint', beforePrint);
+      window.removeEventListener('afterprint', afterPrint);
+      siblings.forEach(el => el.style.removeProperty('display'));
+      overlay.style.position = '';
+    }
+    window.addEventListener('beforeprint', beforePrint);
+    window.addEventListener('afterprint', afterPrint);
+
     setTimeout(() => window.print(), 100);
   }
 
   function closeStagePrint() {
     document.getElementById('stage-print-overlay').classList.remove('visible');
-    document.body.classList.remove('stage-printing');
     const pageStyle = document.getElementById('stage-page-style');
     if (pageStyle) pageStyle.remove();
   }
