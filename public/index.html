@@ -517,65 +517,45 @@
     }
 
     .stage-col-header {
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #aaa;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #000;
       padding-bottom: 6px;
-      border-bottom: 2px solid #000;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .stage-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 8px 0;
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: baseline;
+      gap: 0 10px;
+      padding: 5px 0;
       border-bottom: 1px solid #e8e8e8;
-      white-space: nowrap;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .stage-num {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: #bbb;
-      min-width: 26px;
+      color: #888;
       text-align: right;
-      flex-shrink: 0;
     }
 
     .stage-title {
-      font-size: 1.8rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      flex: 1;
     }
 
     .stage-key {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #fff;
-      background: #000;
-      text-align: center;
-      padding: 3px 14px;
-      border-radius: 6px;
-      flex-shrink: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #333;
     }
 
-    .stage-bpm {
-      font-size: 1rem;
-      color: #888;
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
+    .stage-bpm { display: none; }
 
-    .stage-footer-row {
-      margin-top: 20px;
-      font-size: 0.9rem;
-      color: #888;
-      display: flex;
-      justify-content: space-between;
-    }
+    .stage-footer-row { display: none; }
 
     #stage-close-btn {
       position: fixed;
@@ -690,11 +670,9 @@
       body.stage-printing #stage-print-overlay {
         display: block !important;
         position: static;
-        padding: 20px 32px;
+        padding: 16px 28px;
       }
-      body.stage-printing #stage-print-overlay h1 { font-size: 1.2rem; margin-bottom: 1px; }
-      body.stage-printing #stage-print-overlay .stage-sub { margin-bottom: 12px; }
-      body.stage-printing .stage-row { padding: 6px 0; }
+      body.stage-printing .stage-row { padding: 4px 0; }
       #stage-close-btn { display: none !important; }
     }
 
@@ -1105,27 +1083,25 @@
           <div class="stage-row">
             <span class="stage-num">${num}</span>
             <span class="stage-title">${escHtml(s.title)}</span>
-            <span class="stage-key">${s.key || '?'}</span>
-            ${s.tempo ? `<span class="stage-bpm">${s.tempo} BPM</span>` : ''}
-            ${s.youtube ? `<a href="${s.youtube}" target="_blank" class="yt-badge yt-badge-stage" title="Watch on YouTube">YT</a>` : ''}
+            <span class="stage-key">${s.key || ''}</span>
           </div>`;
       }).join('');
     }
 
     const col1Html = renderColRows(col1Songs, 0);
     const col2Html = col2Songs.length ? renderColRows(col2Songs, col1Songs.length) : '';
-    const col2Header = col2Label ? `<div class="stage-col-header">${col2Label}</div>` : '';
+    const hasBreak = breakIdx !== -1;
 
     document.getElementById('stage-print-content').innerHTML = `
-      <h1>🎶 Órale</h1>
-      <div class="stage-sub">${escHtml(name)}${dateStr ? ' &nbsp;·&nbsp; ' + dateStr : ''}</div>
       <div class="stage-songs" style="${col2Html ? '' : 'grid-template-columns: 1fr'}">
-        <div class="stage-col">${col1Html}</div>
-        ${col2Html ? `<div class="stage-col">${col2Header}${col2Html}</div>` : ''}
-      </div>
-      <div class="stage-footer-row">
-        <span>${actualSongs.length} songs</span>
-        <span>~${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}</span>
+        <div class="stage-col">
+          ${hasBreak ? '<div class="stage-col-header">Set 1</div>' : ''}
+          ${col1Html}
+        </div>
+        ${col2Html ? `<div class="stage-col">
+          ${hasBreak ? '<div class="stage-col-header">Set 2</div>' : ''}
+          ${col2Html}
+        </div>` : ''}
       </div>
     `;
 
