@@ -517,7 +517,7 @@
     }
 
     .stage-col-header {
-      font-size: 1.15rem;
+      font-size: 1.35rem;
       font-weight: 700;
       color: #000;
       padding-bottom: 6px;
@@ -526,29 +526,29 @@
 
     .stage-row {
       display: grid;
-      grid-template-columns: 28px 1fr auto;
+      grid-template-columns: 32px 1fr auto;
       align-items: baseline;
       gap: 0 10px;
-      padding: 5px 0;
+      padding: 6px 0;
       border-bottom: 1px solid #e8e8e8;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
     .stage-num {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: #888;
       text-align: right;
     }
 
     .stage-title {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
     }
 
     .stage-key {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: #333;
     }
@@ -569,6 +569,28 @@
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
+    }
+
+    /* ── Rehearsal notes (shown only in Rehearsal print) ── */
+    .item-notes { display: none; }
+    @media print {
+      body.rehearsal-print .item-notes {
+        display: block;
+        margin-top: 5px;
+        padding: 6px 9px;
+        background: #f5f5f5;
+        border-left: 3px solid #000;
+        font-size: 0.8rem;
+        color: #333;
+        white-space: pre-wrap;
+      }
+      body.rehearsal-print .item-notes-label {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.65rem;
+        letter-spacing: 0.05em;
+        color: #000;
+      }
     }
 
     /* ── Load Setlist Modal ── */
@@ -670,7 +692,7 @@
       body.stage-printing #stage-print-overlay {
         display: block !important;
         position: static;
-        padding: 16px 28px;
+        padding: 0;
       }
       body.stage-printing .stage-row { padding: 4px 0; }
       #stage-close-btn { display: none !important; }
@@ -810,6 +832,7 @@
         <button class="btn-secondary" onclick="copyText()" title="Copy plain text for texting">Copy Text</button>
         <button class="btn-secondary" onclick="stagePrint()">Stage Print</button>
         <button class="btn-secondary" onclick="printSetlist()">Full Print</button>
+        <button class="btn-secondary" onclick="printRehearsal()">Rehearsal</button>
         <button class="btn-primary" id="save-btn" onclick="saveToNotion()">Save to Notion</button>
       </div>
     </div>
@@ -939,6 +962,7 @@
             <span class="key-badge">${s.key || '?'}</span>
             <div class="item-info">
               <div class="item-title">${escHtml(s.title)}</div>
+              ${s.notes ? `<div class="item-notes"><span class="item-notes-label">Rehearsal Notes:</span> ${escHtml(s.notes)}</div>` : ''}
               <div class="item-sub">${escHtml(s.artist)}${s.duration ? ` · ${s.duration} min` : ''}</div>
               ${s.youtube ? `<div class="yt-url-print">${escHtml(s.youtube)}</div>` : ''}
             </div>
@@ -1112,7 +1136,7 @@
       pageStyle.id = 'stage-page-style';
       document.head.appendChild(pageStyle);
     }
-    pageStyle.textContent = '@page { size: landscape; }';
+    pageStyle.textContent = '@page { size: landscape; margin: 0.5in; }';
 
     const overlay = document.getElementById('stage-print-overlay');
     overlay.classList.add('visible');
@@ -1192,6 +1216,18 @@
       `${actualSongs.length} songs &nbsp;·&nbsp; Total: ${h > 0 ? `${h}h ${m}m` : `${Math.floor(total)}m`}`;
 
     window.print();
+  }
+
+  // Same as Full Print, but with each song's Notion "Notes" shown under the title
+  function printRehearsal() {
+    if (!setlistSongs.length) { showToast('Add songs before printing', 'error'); return; }
+    document.body.classList.add('rehearsal-print');
+    function afterPrint() {
+      document.body.classList.remove('rehearsal-print');
+      window.removeEventListener('afterprint', afterPrint);
+    }
+    window.addEventListener('afterprint', afterPrint);
+    printSetlist();
   }
 
   // ── Save to Notion ──

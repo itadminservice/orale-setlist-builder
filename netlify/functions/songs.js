@@ -47,6 +47,7 @@ exports.handler = async () => {
         tempo: p['Tempo']?.rich_text[0]?.plain_text || '',
         status: p['Status'].select?.name || '',
         homework: p['HomeWork']?.checkbox || false,
+        notes: p['Notes']?.rich_text[0]?.plain_text || '',
       });
     }
 
